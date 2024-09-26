@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://createDiseaseWarningMailing.title">
+    <data readOnly="true">
+        <collection id="petTypesDc"
+                    class="io.jmix.petclinic.entity.pet.PetType">
+            <fetchPlan extends="_base"/>
+            <loader id="petTypesDl">
+                <query>
+                    <![CDATA[select e from petclinic_PetType e]]>
+                </query>
+            </loader>
+        </collection>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="createDiseaseWarningMailing"
+                text="msg://create"
+                actionVariant="PRIMARY"
+        />
+    </actions>
+    <layout spacing="true">
+        <select
+                id="petType"
+                itemsContainer="petTypesDc"
+                width="100%"
+                label="msg://petType"
+                requiredMessage="msg://petTypeRequired"
+                required="true"
+        />
+        <textField
+                id="city"
+                required="true"
+                width="100%"
+                requiredMessage="msg://cityRequired"
+                label="msg://city"
+        />
+        <textField
+                id="disease"
+                required="true"
+                width="100%"
+                requiredMessage="msg://diseaseRequired"
+                label="msg://disease"
+        />
+        <hbox id="buttonsPanel" classNames="buttons-panel">
+            <button
+                    id="createDiseaseWarningMailingBtn"
+                    action="createDiseaseWarningMailing"
+            />
+        </hbox>
+    </layout>
+</view>
