@@ -1,4 +1,4 @@
-package io.jmix.petclinic.app;
+package io.jmix.petclinic.service;
 
 import io.jmix.core.DataManager;
 import io.jmix.core.FetchPlan;
@@ -12,9 +12,9 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+// tag::disease-warning-mailing[]
 @Component
 public class DiseaseWarningMailingService {
-
 
     private final Emailer emailer;
     private final DataManager dataManager;
@@ -26,20 +26,28 @@ public class DiseaseWarningMailingService {
 
     public int warnAboutDisease(PetType petType, String disease, String city) {
 
-        List<Pet> petsInDiseaseCity = findPetsInDiseaseCity(petType, city);
-
-        List<Pet> petsWithEmail = filterPetsWithValidOwnersEmail(petsInDiseaseCity);
+        List<Pet> petsWithEmail = petsInDiseaseCity(petType, city)
+                .stream()
+                .filter(pet -> StringUtils.hasText(pet.getOwner().getEmail()))
+                .toList();
 
         petsWithEmail.forEach(pet -> sendEmailToPetsOwner(pet, disease, city));
 
         return petsWithEmail.size();
     }
 
-    private List<Pet> filterPetsWithValidOwnersEmail(List<Pet> petsInDiseaseCity) {
-        return petsInDiseaseCity
-                .stream()
-                .filter(pet -> StringUtils.hasText(pet.getOwner().getEmail()))
-                .toList();
+    private List<Pet> petsInDiseaseCity(PetType petType, String city) {
+        return dataManager.load(Pet.class)
+                .query(
+                        "select e from petclinic_Pet e where e.owner.city = :ownerCity and e.type = :petType")
+                .parameter("ownerCity", city)
+                .parameter("petType", petType)
+                .fetchPlan(pet -> {
+                    pet.addFetchPlan(FetchPlan.BASE);
+                    pet.add("owner", FetchPlan.BASE);
+                    pet.add("type", FetchPlan.BASE);
+                })
+                .list();
     }
 
     private void sendEmailToPetsOwner(Pet pet, String disease, String city) {
@@ -53,12 +61,8 @@ public class DiseaseWarningMailingService {
                 
                 Jmix Petclinic Inc.
                 """
-                .formatted(
-                        pet.getOwner().getFullName(),
-                        city,
-                        disease,
-                        pet.getName()
-                );
+                .formatted(pet.getOwner().getFullName(), city, disease, pet.getName());
+
         EmailInfo email = EmailInfoBuilder.create()
                 .setAddresses(pet.getOwner().getEmail())
                 .setSubject("Warning about %s in the Area of %s".formatted(disease, city))
@@ -66,21 +70,6 @@ public class DiseaseWarningMailingService {
                 .build();
 
         emailer.sendEmailAsync(email);
-
-
-    }
-
-    private List<Pet> findPetsInDiseaseCity(PetType petType, String city) {
-        return dataManager.load(Pet.class)
-                .query(
-                        "select e from petclinic_Pet e where e.owner.city = :ownerCity and e.type = :petType")
-                .parameter("ownerCity", city)
-                .parameter("petType", petType)
-                .fetchPlan(pet -> {
-                    pet.addFetchPlan(FetchPlan.BASE);
-                    pet.add("owner", FetchPlan.BASE);
-                    pet.add("type", FetchPlan.BASE);
-                })
-                .list();
     }
 }
+// end::disease-warning-mailing[]

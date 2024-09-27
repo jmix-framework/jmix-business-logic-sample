@@ -1,17 +1,21 @@
-package io.jmix.petclinic.view.contact;
+package io.jmix.petclinic.view.pet.pet.contact;
 
 import io.jmix.core.DataManager;
 import io.jmix.core.Id;
 import io.jmix.core.Messages;
 import io.jmix.petclinic.entity.owner.Owner;
 import io.jmix.petclinic.entity.pet.Pet;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static org.springframework.util.StringUtils.*;
+
+
+// tag::fetch-contact-logic[]
 @Component
 public class PetContactFetcher {
+
     private final DataManager dataManager;
     private final Messages messages;
 
@@ -29,21 +33,22 @@ public class PetContactFetcher {
             Owner owner = petOwner.get();
             String telephone = owner.getTelephone();
             String email = owner.getEmail();
-            String address = formatOwnerAddress(owner);
 
-            if (isAvailable(telephone)) {
+            if (hasText(telephone)) {
                 return createContact(telephone, ContactType.TELEPHONE);
-            } else if (isAvailable(email)) {
+            } else if (hasText(email)) {
                 return createContact(email, ContactType.EMAIL);
-            } else if (isAvailable(address)) {
-                return createContact(address, ContactType.ADDRESS);
             } else {
-                return Optional.empty();
+                String address = formatOwnerAddress(owner);
+                if (hasText(address)) {
+                    return createContact(address, ContactType.ADDRESS);
+                } else {
+                    return Optional.empty();
+                }
             }
         } else {
             return Optional.empty();
         }
-
     }
 
     private Optional<Contact> createContact(String contactValue, ContactType contactType) {
@@ -63,8 +68,5 @@ public class PetContactFetcher {
         }
         return dataManager.load(Id.of(pet.getOwner())).optional();
     }
-
-    private boolean isAvailable(String contactOption) {
-        return StringUtils.isNotBlank(contactOption);
-    }
 }
+// end::fetch-contact-logic[]

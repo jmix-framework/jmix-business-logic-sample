@@ -66,7 +66,6 @@
                     dataLoader="petsDl"
                     labelPosition="TOP"
                     label="msg://io.jmix.petclinic.entity.pet/Pet.owner">
-
                 <entityComboBox metaClass="petclinic_Owner" itemsContainer="ownersDc" />
             </propertyFilter>
             <button id="clearFilterBtn" action="clearFilterAction" />
@@ -80,9 +79,11 @@
             <button id="editBtn" action="petsDataGrid.edit"/>
             <button id="removeBtn" action="petsDataGrid.remove"/>
             <button id="excelExportBtn" action="petsDataGrid.excelExport"/>
+            <!-- tag::calculate-discount-button[] -->
             <button id="calculateDiscountBtn"
                     action="petsDataGrid.calculateDiscount"
             />
+            <!-- end::calculate-discount-button[] -->
             <button id="fetchContactBtn"
                     action="petsDataGrid.fetchContact"
             />
@@ -90,6 +91,8 @@
                     action="petsDataGrid.createDiseaseWarningMailing"/>
             <simplePagination id="pagination" dataLoader="petsDl"/>
         </hbox>
+
+        <!-- tag::calculate-discount-action[] -->
         <dataGrid id="petsDataGrid"
                   width="100%"
                   minHeight="20em"
@@ -99,6 +102,7 @@
                 <action id="edit" type="list_edit"/>
                 <action id="remove" type="list_remove"/>
                 <action id="excelExport" type="grdexp_excelExport"/>
+
                 <action id="calculateDiscount"
                         type="list_itemTracking"
                         text="msg://calculateDiscount"
@@ -114,6 +118,7 @@
                         icon="BULLSEYE"
                 />
             </actions>
+            <!-- end::calculate-discount-action[] -->
             <columns>
                 <column property="name"/>
                 <column property="identificationNumber"/>

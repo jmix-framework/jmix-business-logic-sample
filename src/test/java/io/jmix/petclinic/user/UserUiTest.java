@@ -41,7 +41,7 @@ public class UserUiTest {
     @Test
     void test_createUser() {
         // Navigate to user list view
-        viewNavigators.view(UserListView.class).navigate();
+        viewNavigators.view(UiComponentUtils.getCurrentView(), UserListView.class).navigate();
 
         UserListView userListView = UiTestUtils.getCurrentView();
 

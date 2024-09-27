@@ -1,4 +1,4 @@
-package io.jmix.petclinic.view.contact;
+package io.jmix.petclinic.view.pet.pet.contact;
 
 public class Contact {
 

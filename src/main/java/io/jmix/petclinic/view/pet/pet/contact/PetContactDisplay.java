@@ -1,13 +1,10 @@
-package io.jmix.petclinic.view.pet.pet;
+package io.jmix.petclinic.view.pet.pet.contact;
 
 import java.util.Optional;
 
 import io.jmix.flowui.Notifications;
-import io.jmix.petclinic.view.contact.Contact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.swing.text.View;
 
 @Component
 public class PetContactDisplay {

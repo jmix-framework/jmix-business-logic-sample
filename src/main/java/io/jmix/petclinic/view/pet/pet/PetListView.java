@@ -1,20 +1,18 @@
 package io.jmix.petclinic.view.pet.pet;
 
-import io.jmix.core.Metadata;
+import com.vaadin.flow.router.Route;
 import io.jmix.core.MetadataTools;
 import io.jmix.flowui.DialogWindows;
 import io.jmix.flowui.Notifications;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.component.propertyfilter.PropertyFilter;
 import io.jmix.flowui.kit.action.ActionPerformedEvent;
-import io.jmix.petclinic.entity.pet.Pet;
-
-import io.jmix.petclinic.view.contact.Contact;
-import io.jmix.petclinic.view.contact.PetContactFetcher;
-import io.jmix.petclinic.view.main.MainView;
-
-import com.vaadin.flow.router.Route;
 import io.jmix.flowui.view.*;
+import io.jmix.petclinic.entity.pet.Pet;
+import io.jmix.petclinic.view.pet.pet.contact.Contact;
+import io.jmix.petclinic.view.pet.pet.contact.PetContactDisplay;
+import io.jmix.petclinic.view.pet.pet.contact.PetContactFetcher;
+import io.jmix.petclinic.view.main.MainView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
@@ -52,13 +50,16 @@ public class PetListView extends StandardListView<Pet> {
         ownerFilter.clear();
     }
 
+    // tag::calculate-discount[]
     @Subscribe("petsDataGrid.calculateDiscount")
     public void onPetsDataGridCalculateDiscount(final ActionPerformedEvent event) {
         Pet pet = petsDataGrid.getSingleSelectedItem();
 
         int discount = calculateDiscount(pet);
 
-        showDiscountCalculatedNotification(pet, discount);
+        notifications.create("Discount for %s: %s%%".formatted(metadataTools.getInstanceName(pet), discount))
+                .withType(Notifications.Type.DEFAULT)
+                .show();
     }
 
     private int calculateDiscount(Pet pet) {
@@ -72,18 +73,7 @@ public class PetListView extends StandardListView<Pet> {
         }
         return discount;
     }
-
-
-    private void showDiscountCalculatedNotification(Pet pet, int discount) {
-
-        String petName = metadataTools.getInstanceName(pet);
-
-        String discountMessage = "Discount for %s: %s%%".formatted(petName, discount);
-
-        notifications.create(discountMessage)
-                .withType(Notifications.Type.DEFAULT)
-                .show();
-    }
+    // end::calculate-discount[]
 
 
     @Subscribe("petsDataGrid.fetchContact")

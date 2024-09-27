@@ -27,6 +27,7 @@
     <actions>
         <action id="saveAction" type="detail_saveClose"/>
         <action id="closeAction" type="detail_close"/>
+        <action id="fetchContact" text="msg://fetchContact" icon="PHONE"/>
     </actions>
     <layout>
         <formLayout id="form" dataContainer="petDc">
@@ -49,6 +50,7 @@
         <hbox id="detailActions">
             <button id="saveAndCloseBtn" action="saveAction"/>
             <button id="closeBtn" action="closeAction"/>
+            <button id="fetchContactBtn" action="fetchContact"/>
         </hbox>
     </layout>
 </view>
