@@ -63,15 +63,15 @@ public class PetListView extends StandardListView<Pet> {
     }
 
     private int calculateDiscount(Pet pet) {
-        int discount = 0;
-
         int visitAmount = pet.getVisits().size();
+
         if (visitAmount > 300) {
-            discount = 10;
+            return 10;
         } else if (visitAmount > 150) {
-            discount = 5;
+            return 5;
         }
-        return discount;
+
+        return 0;
     }
     // end::calculate-discount[]
 
