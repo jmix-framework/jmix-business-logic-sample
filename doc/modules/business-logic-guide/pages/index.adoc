@@ -59,7 +59,7 @@ In Jmix, the button for triggering the logic is defined in the view's XML file. 
 .pet-list-view.xml
 [source,xml,indent=0]
 ----
-include::example$/{sample-project}/src/main/resources/io/jmix/petclinic/view/pet/pet/pet-list-view.xml[tags=calculate-discount-action]
+include::example$/{sample-project}/main/resources/io/jmix/petclinic/view/pet/pet/pet-list-view.xml[tags=calculate-discount-action]
 ----
 
 The `action` tag in the XML file defines a named action (`calculateDiscount`) that is linked to the `calculateDiscountBtn` button. By using the type `list_itemTracking` the action can only be invoked when at least one entity is selected in the data grid.
@@ -74,7 +74,7 @@ Now that we have the button and action defined, we move to the controller to imp
 .PetListView.java
 [source,java,indent=0]
 ----
-include::example$/{sample-project}/src/main/java/io/jmix/petclinic/view/pet/pet/PetListView.java[tags=calculate-discount]
+include::example$/{sample-project}/main/java/io/jmix/petclinic/view/pet/pet/PetListView.java[tags=calculate-discount]
 ----
 
 [[limitations]]
@@ -99,7 +99,7 @@ The example that is implemented as a shared UI class is to display the contact i
 .PetContactFetcher.java
 [source,java,indent=0]
 ----
-include::example$/{sample-project}/src/main/java/io/jmix/petclinic/view/pet/pet/contact/PetContactFetcher.java[tags=fetch-contact-logic]
+include::example$/{sample-project}/main/java/io/jmix/petclinic/view/pet/pet/contact/PetContactFetcher.java[tags=fetch-contact-logic]
 ----
 
 The `@Component` annotation on the `PetContactFetcher` class registers the class in the Spring context. It can be injected via `@Autowired` into other beans and view controllers exactly like all Jmix standard APIs.
@@ -112,7 +112,7 @@ Here you can see the usage of the `PetContactFetcher` bean in the Pet detail vie
 .PetDetailView.java
 [source,java,indent=0]
 ----
-include::example$/{sample-project}/src/main/java/io/jmix/petclinic/view/pet/pet/PetDetailView.java[tags=fetch-contact]
+include::example$/{sample-project}/main/java/io/jmix/petclinic/view/pet/pet/PetDetailView.java[tags=fetch-contact]
 ----
 
 The benefit compared to the first in-controller solution is that you can share the logic between different UI views.
@@ -134,7 +134,7 @@ An example of business logic that could be handled in a service is sending out w
 .DiseaseWarningMailingService.java
 [source,java,indent=0]
 ----
-include::example$/{sample-project}/src/main/java/io/jmix/petclinic/service/DiseaseWarningMailingService.java[tags=disease-warning-mailing]
+include::example$/{sample-project}/main/java/io/jmix/petclinic/service/DiseaseWarningMailingService.java[tags=disease-warning-mailing]
 ----
 
 This service interacts with the database to find pets in a given location, retrieves owner email addresses, and sends out automated warnings using the https://www.jmix.io/marketplace/email-sending/[Jmix Email add-on].
@@ -147,7 +147,7 @@ The disease warning service can be invoked from different parts of the applicati
 .PetDiseaseWarningScreen.java
 [source,java,indent=0]
 ----
-include::example$/{sample-project}/src/main/java/io/jmix/petclinic/view/pet/pet/CreateDiseaseWarningMailing.java[tags=disease-warning-service-usage]
+include::example$/{sample-project}/main/java/io/jmix/petclinic/view/pet/pet/CreateDiseaseWarningMailing.java[tags=disease-warning-service-usage]
 ----
 
 Centralizing business logic in services allows you to efficiently reuse, maintain, and extend business rules while managing database interactions across the application. It also provides the ability to test the functionality in isolation without involving the user interface. This can oftentimes simplify the test setup and speeds up the test execution.
