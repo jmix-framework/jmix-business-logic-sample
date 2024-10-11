@@ -1,0 +1,160 @@
+:sample-project: jmix-business-logic-sample
+
+= Creating Business Logic in Jmix
+
+One of the first questions after creating the initial data model in a Jmix application is: _Where should I put my custom logic?_ In any application, custom / business logic is the foundation that drives unique functionality, ensuring that user actions and data processing reflect the specific needs of the business. In Jmix, you have several options to structure your business logic, each suited for different types of operations and complexity levels.
+
+This guide will walk you through the available options, including placing logic in controllers, sharing logic across UI views, and centralizing business processes in reusable services. By the end of this guide, you will understand the pros and cons of each approach and how to implement them effectively in a Jmix application.
+
+[[requirements]]
+== Requirements
+
+If you want to implement this guide step by step, you will need the following:
+
+1. xref:ROOT:setup.adoc[Setup Jmix Studio]
+2. Download the sample project. You can **download the completed sample project**, which includes all the examples used in this guide. This allows you to explore the finished implementation and experiment with the functionality right away.
+* https://github.com/jmix-framework/{sample-project}/archive/refs/heads/main.zip[Download^] and unzip the source repository
+* or clone it using git:
+`git clone https://github.com/jmix-framework/{sample-project}.git`
+
+Alternatively, you can **start with the base Petclinic project** and follow the step-by-step instructions in this guide to implement the features yourself: https://github.com/jmix-framework/jmix-petclinic-2[Jmix Petclinic] and follow along to add the functionality step-by-step.
+
+[[what-we-are-going-to-build]]
+== What We are Going to Build
+
+This guide enhances the https://github.com/jmix-framework/jmix-petclinic-2[Jmix Petclinic^] example to demonstrate how business logic can be structured in a Jmix application. The Petclinic application simulates a real-world scenario where various business rules and processes are required, such as calculating discounts for pets based on the total number of their visits to the clinic.
+
+The application includes the following features:
+
+- **Calculate Discount**: Automatically calculate discounts for pets based on the total number of their visits to the clinic. This feature is triggered from the Pet list view and helps manage client loyalty with custom discount rules.
+- **Fetch Contact Information**: Quickly retrieve and display the contact details of a pet's owner from both the Pet list and Pet detail views. This shared logic is reusable across multiple views for easy access to owner information.
+- **Send Disease Warning Mailings**: In case of a disease outbreak, the system can send automated warning emails to pet owners whose pets may be at risk, based on their location and pet type. This background service ensures that owners are informed promptly.
+
+These features showcase how business logic can be structured and implemented efficiently in a Jmix application to handle both UI-driven actions and background processes.
+
+[[final-application]]
+=== Final Application
+
+video::zTYx_KSeMzY[youtube,width=1280,height=600]
+
+[[what-is-business-logic]]
+== What is Business Logic?
+
+Business Logic defines the custom rules and operations that make an application unique by reflecting specific business requirements. It includes:
+
+- **UI-based Logic**: Affects how the interface responds to user actions, such as form validations or dynamic changes like cascading dropdowns.
+- **Validation Rules**: Ensures that data follows business-specific constraints, enforcing rules that are critical for the application's correctness.
+- **Automation**: Performs background tasks such as sending automated notifications, generating reports, or managing recurring processes.
+
+[[business-logic-in-controllers]]
+== Business Logic in Controllers
+
+A common scenario in many applications is to perform business logic directly from the user interface. In the Petclinic application, we want to calculate a discount for a pet when a user clicks a button on the Pet list view. This is achieved by defining an action in the UI XML file and linking it to a method in the view controller.
+
+[[defining-action-in-view]]
+=== Defining Action in View
+
+In Jmix, the button for triggering the logic is defined in the view's XML file. First, we define the button that will be responsible for starting the discount calculation. This button is linked to an action that we define separately within the same XML file. The action will track the selected pet in the list and trigger the discount calculation.
+
+.pet-list-view.xml
+[source,xml,indent=0]
+----
+include::example$/{sample-project}/src/main/resources/io/jmix/petclinic/view/pet/pet/pet-list-view.xml[tags=calculate-discount-action]
+----
+
+The `action` tag in the XML file defines a named action (`calculateDiscount`) that is linked to the `calculateDiscountBtn` button. By using the type `list_itemTracking` the action can only be invoked when at least one entity is selected in the data grid.
+
+When the button is clicked, the action triggers the associated logic in the controller. To handle this in the controller, we subscribe to the action event in the controller class and define the business logic, such as calculating the discount for the selected pet.
+
+[[implementing-the-controller-logic]]
+=== Implementing the Controller Logic
+
+Now that we have the button and action defined, we move to the controller to implement the business logic. When the user clicks the "Calculate discount" button, the controller will handle the event and execute the logic to calculate and display the discount for the selected pet.
+
+.PetListView.java
+[source,java,indent=0]
+----
+include::example$/{sample-project}/src/main/java/io/jmix/petclinic/view/pet/pet/PetListView.java[tags=calculate-discount]
+----
+
+[[limitations]]
+=== Limitations
+
+Implementing business logic directly in the controller is a simple approach when the logic is tied to user interactions and only needed in a single view. It works well for small, UI-specific tasks where the logic is unlikely to be reused elsewhere.
+
+However, as your application grows, this approach can lead to code duplication and become harder to maintain. Additionally, controller-based logic will not be executed if entities are manipulated via the Jmix Generic REST API or other external interfaces. For example, if certain fields need to be set consistently when an entity is modified, placing the logic in the UI controller can cause issues when the entity is accessed through the API.
+
+To ensure consistent behavior across all interfaces, and to improve code reusability and testability, it is better to move business logic to shared services or classes. This allows the logic to be applied uniformly, whether through the UI, API, or other entry points.
+
+[[shared-ui-logic]]
+== Shared UI Logic
+
+The in-controller solution works as long as the logic should only be executed within one view. Once the calculation should be executed in multiple UI views there is a better way not to duplicate the code. The logic can be extracted to a common place available for both controllers.
+
+[[spring-bean-containing-the-logic]]
+=== Spring Bean Containing the Logic
+
+The example that is implemented as a shared UI class is to display the contact information of the pet's owner directly from the pet list view or the pet details view.
+
+.PetContactFetcher.java
+[source,java,indent=0]
+----
+include::example$/{sample-project}/src/main/java/io/jmix/petclinic/view/pet/pet/contact/PetContactFetcher.java[tags=fetch-contact-logic]
+----
+
+The `@Component` annotation on the `PetContactFetcher` class registers the class in the Spring context. It can be injected via `@Autowired` into other beans and view controllers exactly like all Jmix standard APIs.
+
+[[using-shared-ui-logic-in-controller]]
+=== Using Shared UI Logic in Controller
+
+Here you can see the usage of the `PetContactFetcher` bean in the Pet detail view:
+
+.PetDetailView.java
+[source,java,indent=0]
+----
+include::example$/{sample-project}/src/main/java/io/jmix/petclinic/view/pet/pet/PetDetailView.java[tags=fetch-contact]
+----
+
+The benefit compared to the first in-controller solution is that you can share the logic between different UI views.
+
+[[business-services]]
+== Business Services
+
+The difference between **Shared UI Logic** and **Business Services** lies in their purpose. Shared UI logic is meant to reuse code across different UI views, while business services handle more complex, often transactional processes that are not tied to the user interface. These include tasks such as processing data, enforcing business rules, interacting with the database, or managing operations like sending notifications or generating reports.
+
+Business services are ideal for handling logic that runs independently from the UI and can be reused across different areas of the application. They often deal with business processes that require database transactions and consistency, such as reading, updating, or aggregating data from multiple sources.
+
+In Jmix, business services are implemented using Spring Beans, annotated with `@Component` or `@Service`, making them available across the application.
+
+[[disease-warning-service]]
+=== Disease Warning Service
+
+An example of business logic that could be handled in a service is sending out warnings to pet owners when there is a disease outbreak in their city.
+
+.DiseaseWarningMailingService.java
+[source,java,indent=0]
+----
+include::example$/{sample-project}/src/main/java/io/jmix/petclinic/service/DiseaseWarningMailingService.java[tags=disease-warning-mailing]
+----
+
+This service interacts with the database to find pets in a given location, retrieves owner email addresses, and sends out automated warnings using the https://www.jmix.io/marketplace/email-sending/[Jmix Email add-on].
+
+[[usage-in-controller]]
+=== Usage in Controller
+
+The disease warning service can be invoked from different parts of the application, such as from views, other services or scheduled jobs. In this case we are using it from a dedicated view that first collects the required information in a form and then passes the values to the service:
+
+.PetDiseaseWarningScreen.java
+[source,java,indent=0]
+----
+include::example$/{sample-project}/src/main/java/io/jmix/petclinic/view/pet/pet/CreateDiseaseWarningMailing.java[tags=disease-warning-service-usage]
+----
+
+Centralizing business logic in services allows you to efficiently reuse, maintain, and extend business rules while managing database interactions across the application. It also provides the ability to test the functionality in isolation without involving the user interface. This can oftentimes simplify the test setup and speeds up the test execution.
+
+[[summary]]
+== Summary
+
+In this guide, we explored three different approaches for placing business logic in a Jmix application, each with its own characteristics. We looked at how logic can be implemented directly in controllers for simpler cases, shared across multiple UI views using reusable components, and centralized in business services for more complex or transactional processes.
+
+Each approach has its advantages depending on the scenario, and understanding these options allows you to choose the right method for structuring business logic in a way that fits your application's needs.
