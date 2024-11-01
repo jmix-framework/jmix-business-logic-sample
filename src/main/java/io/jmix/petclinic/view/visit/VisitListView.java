@@ -104,7 +104,7 @@ public class VisitListView extends StandardListView<Visit> {
             }
             List<String> date = queryParameters.getParameters().get(DATE_PARAM);
             if (date != null) {
-                calendar.navigateToDate(LocalDate.parse(date.getFirst()));
+                calendar.navigateToDate(LocalDate.parse(date.get(0)));
             }
         }
 
