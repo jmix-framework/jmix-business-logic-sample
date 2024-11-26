@@ -32,10 +32,10 @@ The application includes the following features:
 
 These features showcase how business logic can be structured and implemented efficiently in a Jmix application to handle both UI-driven actions and background processes.
 
-[[final-application]]
-=== Final Application
-
-video::zTYx_KSeMzY[youtube,width=1280,height=600]
+// [[final-application]]
+// === Final Application
+//
+// video::zTYx_KSeMzY[youtube,width=1280,height=600]
 
 [[what-is-business-logic]]
 == What is Business Logic?
