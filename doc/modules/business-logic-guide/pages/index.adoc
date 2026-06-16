@@ -153,7 +153,7 @@ This service interacts with the database to find pets in a given location, retri
 
 The disease warning service can be invoked from different parts of the application, such as from views, other services or scheduled jobs. In this case we are using it from a dedicated view that first collects the required information in a form and then passes the values to the service:
 
-.PetDiseaseWarningScreen.java
+.CreateDiseaseWarningMailing.java
 [source,java,indent=0]
 ----
 include::example$/src/main/java/io/jmix/petclinic/view/pet/pet/CreateDiseaseWarningMailing.java[tags=disease-warning-service-usage]
